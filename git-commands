@@ -1,0 +1,109 @@
+git submodule add -f https://github.com/p-ranav/indicators.git external/progress_bar
+
+gh repo create "UMISI-sem2-MLops" --public --source . --remote origin --push
+
+
+
+git branch -a
+
+
+// new feature branch //
+
+    git switch master
+    git pull
+    git switch -c feature_branch
+
+// new commit //
+
+    git add .
+    git commit -m "fast"
+    git push
+    /
+    git push -u origin feature_branch       # na razie branch jest tylko lokalny, podczas pierwszego pushowania prosimy o stworzenie takiej branch na Remote repo      -> automat -> git config --global push.autoSetupRemote true
+
+// merge to master //
+
+    git switch master
+    git pull
+    git merge feature_branch
+    /
+    git merge --no-ff feature_branch        # -> git log --graph
+    git push
+
+// rebase feature_branch //
+
+    // update local master //               # -> git switch master; git pull; git switch feature_branch
+
+    git merge master                        # -> robi brzydką historię
+    /
+    git rebase master
+    git push --force-with-lease             # podmienia id commitów
+
+// clean merged branch //
+    git branch -d feature_branch
+    git push origin --delete feature_branch
+
+
+
+
+
+
+
+
+// REMOTE Upstream //
+
+    git remote -v
+
+    git switch master
+    git pull --rebase upstream master
+
+    // branch was deleted //
+    git fetch --prune
+
+// fork -> branch -> local master -> upstream PR //
+
+    gh repo fork owner/repo --clone         # origin = mój fork, upstream = oryginał (ustawia się automatycznie)
+    /
+    git remote add upstream https://github.com/owner/repo.git      # jeśli fork był sklonowany ręcznie
+
+    // sync fork master with upstream //
+    git switch master
+    git pull --rebase upstream master
+    /
+    git fetch upstream; git rebase upstream/master
+    git push origin master
+
+    // new feature branch //
+    git switch -c feature_branch
+    git add .
+    git commit -m "feature"
+    git push                                # z push.autoSetupRemote true -> leci na origin (fork), bo branch z lokalnego mastera nie ma trackingu
+    /
+    git push -u origin feature_branch       # bez autoSetupRemote
+
+    // merge to local master //
+    git switch master
+    git merge --no-ff feature_branch
+    git push origin master                  # master forka != master upstream, upstream jeszcze nic nie wie
+
+    // upstream pull request //
+    gh pr create --repo owner/repo --base master --head my_user:feature_branch
+    /
+    gh pr create --repo owner/repo --base master --head my_user:master      # PR z mastera -> każdy kolejny push na master forka ląduje w tym samym PR
+    /
+    gh pr view --web                        # -> albo przycisk "Compare & pull request" na GitHubie
+
+    // fixes after review //
+    git switch feature_branch
+    git commit -am "review fixes"
+    git push                                # PR aktualizuje się sam, nie trzeba tworzyć nowego
+
+    // after PR merged in upstream //
+    git switch master
+    git fetch upstream
+    git reset --hard upstream/master        # upstream mógł zrobić squash/rebase -> inne id commitów niż w moim merge
+    git push --force-with-lease origin master
+    
+    git branch -d feature_branch            # -> -D jeśli squash (git nie widzi, że jest zmergowany)
+    git push origin --delete feature_branch
+
