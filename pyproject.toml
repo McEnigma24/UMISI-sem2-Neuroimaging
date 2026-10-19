@@ -1,0 +1,19 @@
+[project]
+name = "umisi-sem2-neuroimaging"
+version = "0.1.0"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "brainspace>=0.2.1",
+    "brainstat>=0.5.2",
+    "dipy>=1.12.1",
+    "ipykernel>=7.4.0",
+    "matplotlib>=3.11.2",
+    "netneurotools>=0.2.5",
+    "nibabel>=5.4.2",
+    "nilearn>=0.10.3",
+    "numpy>=2.4.6",
+    "pandas>=3.0.6",
+    "scikit-learn>=1.9.1",
+    "scipy>=1.17.1",
+    "setuptools<81",
+]
